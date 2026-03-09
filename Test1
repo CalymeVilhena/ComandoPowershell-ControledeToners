@@ -1,0 +1,87 @@
+$arquivo = "C:\Users\calyme.santos\Documents\tonersTEST.xlsx"
+
+$excel = New-Object -ComObject Excel.Application
+$excel.Visible = $true
+
+$workbook = $excel.Workbooks.Open($arquivo,$null,$false)
+$sheet = $workbook.Worksheets.Item(1)
+
+while ($true) {
+
+    Write-Host ""
+    Write-Host "=== CONTROLE DE TONERS ==="
+    Write-Host "1 - Entrada de toner"
+    Write-Host "2 - Saida de toner"
+    Write-Host "3 - Ver estoque"
+    Write-Host "4 - Sair"
+
+    $opcao = Read-Host "Escolha"
+
+    if ($opcao -eq "1") {
+	
+        $toner = Read-Host "Digite o toner"
+        $quantidade = [int](Read-Host "Quantidade que chegou")
+
+        $linhas = $sheet.UsedRange.Rows.Count
+
+        for ($i=2; $i -le $linhas; $i++) {
+
+            if ($sheet.Cells.Item($i,3).Value2 -eq $toner) {
+
+                $atual = [int]$sheet.Cells.Item($i,3).Value2
+                $sheet.Cells.Item($i,4) = $atual + $quantidade
+
+                Write-Host "Estoque atualizado!"
+                break
+            }
+        }
+
+        $workbook.Save()
+    }
+
+    elseif ($opcao -eq "2") {
+
+        $toner = Read-Host "Digite o toner"
+        $qtd = [int](Read-Host "Quantidade retirada")
+
+        $linhas = $sheet.UsedRange.Rows.Count
+
+        for ($i=2; $i -le $linhas; $i++) {
+
+            if ($sheet.Cells.Item($i,2).Value2 -eq $toner) {
+
+                $atual = [int]$sheet.Cells.Item($i,3).Value2
+                $sheet.Cells.Item($i,3) = $atual - $qtd
+
+                Write-Host "Estoque atualizado!"
+                break
+            }
+        }
+
+        $workbook.Save()
+    }
+
+    elseif ($opcao -eq "3") {
+
+        $linhas = $sheet.UsedRange.Rows.Count
+
+        Write-Host ""
+        Write-Host "ESTOQUE ATUAL"
+
+        for ($i=2; $i -le $linhas; $i++) {
+
+            $imp = $sheet.Cells.Item($i,1).Text
+            $ton = $sheet.Cells.Item($i,2).Text
+            $qtd = $sheet.Cells.Item($i,3).Text
+
+            Write-Host "$imp | $ton | $qtd"
+        }
+    }
+
+    elseif ($opcao -eq "4") {
+        break
+    }
+}
+
+$workbook.Close()
+$excel.Quit()
